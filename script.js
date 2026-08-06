@@ -15,6 +15,7 @@ function renderRepos(repos) {
 
   if (!Array.isArray(repos) || repos.length === 0) {
     status.textContent = 'No starred repositories found.';
+    list.replaceChildren();
     return;
   }
 
@@ -24,15 +25,31 @@ function renderRepos(repos) {
     const li = document.createElement('li');
     li.className = 'repo-card';
 
-    li.innerHTML = `
-      <h2><a href="${repo.url}" target="_blank" rel="noopener noreferrer">${repo.name}</a></h2>
-      <p>${repo.description || 'No description available.'}</p>
-      <div class="repo-meta">
-        <span>⭐ ${repo.stars.toLocaleString()}</span>
-        <span>${repo.language || 'Unknown language'}</span>
-        <span>Starred ${formatDate(repo.starred_at)}</span>
-      </div>
-    `;
+    const title = document.createElement('h2');
+    const link = document.createElement('a');
+    link.href = repo.url || '#';
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    link.textContent = repo.name || 'Repository';
+    title.appendChild(link);
+
+    const description = document.createElement('p');
+    description.textContent = repo.description || 'No description available.';
+
+    const meta = document.createElement('div');
+    meta.className = 'repo-meta';
+
+    const stars = document.createElement('span');
+    stars.textContent = `⭐ ${Number.isFinite(repo.stars) ? repo.stars.toLocaleString() : '0'}`;
+
+    const language = document.createElement('span');
+    language.textContent = repo.language || 'Unknown language';
+
+    const starredAt = document.createElement('span');
+    starredAt.textContent = `Starred ${repo.starred_at ? formatDate(repo.starred_at) : 'unknown date'}`;
+
+    meta.append(stars, language, starredAt);
+    li.append(title, description, meta);
 
     return li;
   });
